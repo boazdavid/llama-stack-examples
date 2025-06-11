@@ -1,0 +1,23 @@
+version: "2"
+image_name: "distribution-ollama"
+
+providers:
+  inference:
+    - provider_id: ollama
+      provider_type: remote::ollama
+      config:
+        url: ${env.OLLAMA_URL:http://ollama:11434}
+        auto_pull: true
+
+models:
+  - model_id: ${env.INFERENCE_MODEL:llama3.2:1b}
+    provider_id: ollama
+    provider_model_id: ${env.INFERENCE_MODEL:llama3.2:1b}
+    metadata: {}
+  
+  - model_id: all-minilm
+    model_type: embedding
+    provider_id: ollama
+    provider_model_id: all-MiniLM:latest
+    metadata:
+      embedding_dimension: 384
