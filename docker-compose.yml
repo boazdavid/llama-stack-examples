@@ -22,7 +22,6 @@ services:
       - 5000:5000
     volumes:
       - ./.llama:/root/.llama
-      - ./llama-stack-config.yaml:/app/llama-stack-config.yaml:ro
     container_name: llama-stack
     pull_policy: always
     restart: always
@@ -30,7 +29,7 @@ services:
       - INFERENCE_MODEL=${INFERENCE_MODEL:-llama3.2:1b}
       - OLLAMA_URL=http://ollama:11434
       - LLAMA_STACK_PORT=5000
-    command: --port 5000 --config /app/llama-stack-config.yaml
+    command: --port 5000 --template ollama
     depends_on:
       - ollama
     networks:

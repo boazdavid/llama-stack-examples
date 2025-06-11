@@ -10,14 +10,12 @@ client = LlamaStackClient(base_url=llama_stack_url)
 
 models = client.models.list()
 
-# Select the LLM model from env or first available
-model_id = os.getenv("INFERENCE_MODEL", "llama3.2:1b")
-
-# Dynamically select the first available embedding model
+# Select the first LLM and first embedding models
+model_id = next(m for m in models if m.model_type == "llm").identifier
 embedding_model_id = (
     em := next(m for m in models if m.model_type == "embedding")
 ).identifier
-embedding_dimension = em.metadata.get("embedding_dimension", 384)
+embedding_dimension = em.metadata["embedding_dimension"]
 
 print(f"Using LLM model: {model_id}")
 print(f"Using embedding model: {embedding_model_id} (dimension: {embedding_dimension})")
