@@ -17,9 +17,6 @@ embedding_model_id = (
 ).identifier
 embedding_dimension = em.metadata["embedding_dimension"]
 
-print(f"Using LLM model: {model_id}")
-print(f"Using embedding model: {embedding_model_id} (dimension: {embedding_dimension})")
-
 _ = client.vector_dbs.register(
     vector_db_id=vector_db_id,
     embedding_model=embedding_model_id,
@@ -42,7 +39,7 @@ client.tool_runtime.rag_tool.insert(
 agent = Agent(
     client,
     model=model_id,
-    instructions="You are a helpful assistant",
+    instructions="You are a helpful assistant with access to knowledge search tools. When answering questions, first search for relevant information using your available tools before providing a response.",
     tools=[
         {
             "name": "builtin::rag/knowledge_search",
