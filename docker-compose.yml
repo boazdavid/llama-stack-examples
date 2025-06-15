@@ -35,6 +35,23 @@ services:
     networks:
       - ollama-docker
 
+  llama-stack-playground:
+    build:
+      context: .
+      dockerfile: Dockerfile.playground
+    ports:
+      - 8501:8501
+    volumes:
+      - ./.llama:/root/.llama
+    container_name: llama-stack-playground
+    restart: always
+    environment:
+      - LLAMA_STACK_ENDPOINT=http://llama-stack:5000
+    depends_on:
+      - llama-stack
+    networks:
+      - ollama-docker
+
 networks:
   ollama-docker:
     driver: bridge

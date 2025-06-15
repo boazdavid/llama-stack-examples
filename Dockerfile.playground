@@ -1,0 +1,8 @@
+FROM llamastack/distribution-ollama:latest
+
+RUN pip install 'llama-stack[ui]'
+
+ENV LLAMA_STACK_ENDPOINT=http://llama-stack:5000
+
+ENTRYPOINT []
+CMD ["streamlit", "run", "/usr/local/lib/python3.10/site-packages/llama_stack/distribution/ui/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
