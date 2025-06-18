@@ -6,7 +6,7 @@ load_dotenv()
 
 vector_db_id = os.getenv("VECTOR_DB_ID", "my_demo_vector_db")
 llama_stack_url = os.getenv("LLAMA_STACK_API_URL", "http://localhost:5000")
-client = LlamaStackClient(base_url=llama_stack_url)
+client = LlamaStackClient(base_url=llama_stack_url, timeout=120)
 
 models = client.models.list()
 

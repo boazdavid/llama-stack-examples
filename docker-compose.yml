@@ -1,7 +1,6 @@
 services:
   ollama:
     image: docker.io/ollama/ollama:latest
-    platform: linux/arm64
     ports:
       - ${OLLAMA_PORT:-7869}:${OLLAMA_INTERNAL_PORT:-11434}
     volumes:

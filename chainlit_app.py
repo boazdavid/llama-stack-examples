@@ -1,14 +1,8 @@
 import chainlit as cl
 import os
+import asyncio
 from dotenv import load_dotenv
-import time
-import logging
 from llama_stack_client import Agent, AgentEventLogger, RAGDocument, LlamaStackClient
-from llama_stack_client.types import UserMessage
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -20,129 +14,52 @@ VECTOR_DB_ID = os.getenv("VECTOR_DB_ID", "my_demo_vector_db")
 # Global variables
 client = None
 agent = None
-model_id = None
-embedding_model_id = None
-embedding_dimension = None
 session_id = None
+initialization_complete = False
+llm_model_id = None
 
 
-async def get_agent_response(message: str) -> str:
-    """Get response from Llama Stack Agent with RAG capabilities"""
-    if not agent:
-        logger.error("Agent not initialized")
-        return "System not initialized. Please refresh and try again."
+async def initialize():
+    """Initialize system with console output only"""
+    global client, agent, initialization_complete, llm_model_id
     
-    start_time = time.time()
-    logger.info(f"Getting agent response for: {message[:50]}...")
-    
-    try:
-        logger.info(f"Creating turn with session_id: {session_id}")
-        response = agent.create_turn(
-            messages=[{"role": "user", "content": message}],
-            session_id=session_id,
-            stream=True
-        )
-        logger.info("Turn created, processing response...")
-        
-        # Collect response text and tool calls
-        response_text = ""
-        tool_calls = []
-        
-        for log in AgentEventLogger().log(response):
-            # Check for tool calls
-            if hasattr(log, 'tool_call') and log.tool_call:
-                tool_name = getattr(log.tool_call, 'tool_name', 'unknown')
-                tool_args = getattr(log.tool_call, 'arguments', {})
-                tool_calls.append({
-                    'name': tool_name,
-                    'args': tool_args
-                })
-            
-            # Extract clean response text (skip tool call formatting)
-            if hasattr(log, 'text') and log.text:
-                # Filter out tool call display text
-                if not (log.text.startswith('[') or log.text.startswith('Tool') or 'knowledge_search' in log.text):
-                    response_text += log.text
-            elif hasattr(log, 'content') and log.content and isinstance(log.content, str):
-                # Filter out tool call display text
-                if not (log.content.startswith('[') or log.content.startswith('Tool') or 'knowledge_search' in log.content):
-                    response_text += log.content
-        
-        elapsed = time.time() - start_time
-        logger.info(f"Response generated in {elapsed:.1f} seconds")
-        
-        return response_text.strip(), tool_calls, elapsed
-        
-    except Exception as e:
-        logger.error(f"Error getting agent response: {str(e)}", exc_info=True)
-        return f"Error: {str(e)}", [], 0
-
-# ====== CHAINLIT HANDLERS ======
-
-
-@cl.on_chat_start
-async def on_chat_start():
-    """Initialize the chat session with RAG capabilities"""
-    global client, agent, model_id, embedding_model_id, embedding_dimension, session_id
-    
-    logger.info("=== Starting chat session ===")
-    logger.info(f"API URL: {API_URL}")
-    logger.info(f"Vector DB ID: {VECTOR_DB_ID}")
+    if initialization_complete:
+        return
     
     try:
         # Initialize client
-        logger.info("Initializing LlamaStackClient...")
-        client = LlamaStackClient(base_url=API_URL)
-        logger.info("Client initialized successfully")
+        print(f"🔌 Connecting to Llama Stack API at {API_URL}...")
+        client = LlamaStackClient(base_url=API_URL, timeout=120)
+        print("✅ Connected to API")
         
-        # Get available models
-        logger.info("Fetching available models...")
+        # Get models
+        print("🔍 Loading models...")
         models = client.models.list()
-        logger.info(f"Found {len(models)} models")
+        llm_model = next(m for m in models if m.model_type == "llm")
+        embedding_model = next(m for m in models if m.model_type == "embedding")
+        llm_model_id = llm_model.identifier
+        print(f"🚀 Using LLM: {llm_model_id}")
+        print(f"🧠 Using embedding: {embedding_model.identifier}")
         
-        # Select the first LLM and embedding models
-        logger.info("Selecting models...")
-        llm_models = [m for m in models if m.model_type == "llm"]
-        embedding_models = [m for m in models if m.model_type == "embedding"]
-        
-        logger.info(f"Available LLM models: {[m.identifier for m in llm_models]}")
-        logger.info(f"Available embedding models: {[m.identifier for m in embedding_models]}")
-        
-        if not llm_models:
-            raise ValueError("No LLM models available")
-        if not embedding_models:
-            raise ValueError("No embedding models available")
-        
-        model_id = llm_models[0].identifier
-        embedding_model = embedding_models[0]
-        embedding_model_id = embedding_model.identifier
-        embedding_dimension = embedding_model.metadata.get("embedding_dimension", 768)
-        
-        logger.info(f"Selected LLM: {model_id}")
-        logger.info(f"Selected embedding model: {embedding_model_id} (dim: {embedding_dimension})")
-        
-        await cl.Message(content=f"🚀 Initializing Llama Stack with:\n- LLM: {model_id}\n- Embedding model: {embedding_model_id}").send()
-        
-        # Set up vector database
+        # Setup vector DB
+        print(f"📊 Setting up vector database: {VECTOR_DB_ID}...")
         try:
-            logger.info(f"Registering vector database: {VECTOR_DB_ID}")
-            _ = client.vector_dbs.register(
+            client.vector_dbs.register(
                 vector_db_id=VECTOR_DB_ID,
-                embedding_model=embedding_model_id,
-                embedding_dimension=embedding_dimension,
+                embedding_model=embedding_model.identifier,
+                embedding_dimension=embedding_model.metadata["embedding_dimension"],
                 provider_id="faiss",
             )
-            logger.info("Vector database registered successfully")
-        except Exception as e:
-            # Vector DB might already be registered
-            logger.warning(f"Vector DB registration failed (might already exist): {str(e)}")
+            print("✅ Vector database ready")
+        except:
+            print("⚠️ Vector database already registered")
         
-        # Hardcode document ingestion like demo_script.py
-        logger.info("Ingesting Paul Graham document...")
-        source = "https://www.paulgraham.com/greatwork.html"
+        # Load document  
+        print("📄 Loading document...")
+        source_url = "https://www.paulgraham.com/greatwork.html"
         document = RAGDocument(
             document_id="document_1",
-            content=source,
+            content=source_url,
             mime_type="text/html",
             metadata={},
         )
@@ -151,61 +68,134 @@ async def on_chat_start():
             client.tool_runtime.rag_tool.insert(
                 documents=[document],
                 vector_db_id=VECTOR_DB_ID,
-                chunk_size_in_tokens=50,
+                chunk_size_in_tokens=50,  # Smaller chunks like demo_script
             )
-            logger.info(f"Document ingested successfully: {source}")
-            await cl.Message(content=f"📄 Document ingested: Paul Graham's 'How to do great work'\n\nReady to answer questions!").send()
+            print("✅ Document loaded and indexed")
         except Exception as e:
-            logger.error(f"Failed to ingest document: {str(e)}")
-            await cl.Message(content=f"⚠️ Failed to ingest document, but you can still chat: {str(e)}").send()
+            print(f"⚠️ Document load failed: {str(e)}")
+            print("⚠️ Continuing without document - basic chat still available")
         
-        # Create agent with RAG tool
-        logger.info("Creating agent...")
+        # Create agent
+        print("🤖 Creating AI agent...")
         agent = Agent(
             client,
-            model=model_id,
-            instructions="You are a helpful assistant",
-            tools=[
-                {
-                    "name": "builtin::rag/knowledge_search",
-                    "args": {"vector_db_ids": [VECTOR_DB_ID]},
-                }
-            ],
+            model=llm_model_id,
+            instructions="You are a helpful assistant with access to knowledge search tools. When answering questions, first search for relevant information using your available tools before providing a response.",
+            tools=[{
+                "name": "builtin::rag/knowledge_search",
+                "args": {"vector_db_ids": [VECTOR_DB_ID]},
+            }],
         )
-        logger.info("Agent created successfully")
         
-        # Create session
-        logger.info("Creating session...")
-        session_id = agent.create_session("chainlit_rag_session")
-        logger.info(f"Session created: {session_id}")
+        initialization_complete = True
+        print("✅ System initialized successfully")
         
     except Exception as e:
-        logger.error(f"Failed to initialize: {str(e)}", exc_info=True)
-        await cl.Message(content=f"Failed to initialize: {str(e)}").send()
+        print(f"❌ Initialization error: {str(e)}")
+        raise e
+
+
+@cl.on_chat_start
+async def on_chat_start():
+    """Initialize the chat session"""
+    global session_id
+    print("=== Starting new chat session ===")
+    print("📱 UI: Displaying welcome message...")
+    
+    # Show welcome message first
+    await cl.Message("👋 **Welcome to Llama Stack Chat!**\n\n🔄 Initializing system...").send()
+    print("✅ UI: Welcome message sent")
+    
+    # Do initialization in background (console only, no UI updates)
+    try:
+        print("🔄 UI: Starting initialization...")
+        await initialize()
+        
+        # Create session after successful initialization
+        print("📝 UI: Creating agent session...")
+        session_id = agent.create_session("chat_session")
+        print(f"📝 Created session: {session_id}")
+        
+        # Show ready message
+        print("📱 UI: Preparing ready message...")
+        if agent:
+            ready_msg = f"✅ **System Ready!**\n\n🤖 Using: {llm_model_id}\n📄 Document: Paul Graham essay\n\n💬 Ask me anything!"
+            await cl.Message(ready_msg).send()
+            print("✅ UI: Ready message sent")
+        else:
+            await cl.Message("⚠️ **Partial initialization** - some features may be limited.").send()
+            print("⚠️ UI: Partial initialization message sent")
+        
+    except Exception as e:
+        error_msg = f"❌ **Initialization failed:** {str(e)}\n\n🔄 The system may still be starting up. Please wait a moment and refresh."
+        print(f"❌ Initialization error: {str(e)}")
+        print("📱 UI: Sending error message...")
+        await cl.Message(error_msg).send()
+        print("❌ UI: Error message sent")
+
+
+@cl.set_starters
+async def set_starters():
+    """Set starter suggestions for the user"""
+    print("📱 UI: Setting up starter suggestions...")
+    starters = [
+        cl.Starter(
+            label="What are the key ideas?",
+            message="What are the key ideas about doing great work according to Paul Graham?",
+        ),
+        cl.Starter(
+            label="How to find what to work on?",
+            message="According to Paul Graham, how do you find what to work on?",
+        ),
+        cl.Starter(
+            label="Role of curiosity?",
+            message="What does Paul Graham say about the role of curiosity in doing great work?",
+        ),
+        cl.Starter(
+            label="Dealing with setbacks?",
+            message="What advice does Paul Graham give about dealing with setbacks and failures?",
+        ),
+    ]
+    print(f"✅ UI: {len(starters)} starter suggestions configured")
+    return starters
+
 
 @cl.on_message
 async def on_message(message: cl.Message):
     """Handle incoming messages"""
-    logger.info(f"Received message: {message.content[:50]}...")
-    result = await get_agent_response(message.content)
+    global session_id
+    print(f"\n📥 UI: Received user message: {message.content}")
+    print(f"🔍 UI: Checking system readiness (agent: {agent is not None}, session: {session_id is not None})")
     
-    if isinstance(result, tuple):
-        response_text, tool_calls, elapsed = result
+    if not agent or not session_id:
+        error_msg = "\u26a0\ufe0f System not ready. Please refresh the page."
+        print(f"❌ UI: System not ready - {error_msg}")
+        print("📤 UI: Sending error response...")
+        await cl.Message(error_msg).send()
+        print("✅ UI: Error response sent")
+        return
+    
+    try:
+        print("🤖 Creating agent response...")
+        # Get response from agent
+        response = agent.create_turn(
+            messages=[{"role": "user", "content": message.content}],
+            session_id=session_id,
+            stream=True
+        )
         
-        # Show tool calls as action steps
-        if tool_calls:
-            for tool_call in tool_calls:
-                tool_name = tool_call['name']
-                tool_args = tool_call['args']
-                await cl.Message(content=f"🔧 **Tool Call:** {tool_name}\n```json\n{tool_args}\n```").send()
+        # Process response using AgentEventLogger like demo_script
+        response_text = ""
+        for log in AgentEventLogger().log(response):
+            # Collect content from inference logs that have actual content
+            if hasattr(log, 'role') and log.role == 'inference' and hasattr(log, 'content') and log.content.strip():
+                response_text += str(log.content)
         
-        # Send final response
-        final_response = f"{response_text}\n\n⏱️ *Response time: {elapsed:.1f} seconds*"
-        logger.info(f"Sending response: {final_response[:50]}...")
-        await cl.Message(content=final_response).send()
-    else:
-        # Handle error case
-        logger.info(f"Sending response: {result[:50]}...")
-        await cl.Message(content=result).send()
-
-
+        final_response = response_text.strip() or "No response generated."
+        print(f"🤖 Assistant: {final_response[:100]}..." if len(final_response) > 100 else f"🤖 Assistant: {final_response}")
+        print("📤 Sending response to UI...")
+        await cl.Message(final_response).send()
+        
+    except Exception as e:
+        print(f"❌ Error: {str(e)}")
+        await cl.Message(f"Error: {str(e)}").send()
