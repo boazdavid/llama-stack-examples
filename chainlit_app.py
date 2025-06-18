@@ -187,9 +187,12 @@ async def on_message(message: cl.Message):
         # Process response using AgentEventLogger like demo_script
         response_text = ""
         for log in AgentEventLogger().log(response):
-            # Collect content from inference logs that have actual content
-            if hasattr(log, 'role') and log.role == 'inference' and hasattr(log, 'content') and log.content.strip():
-                response_text += str(log.content)
+            # Look for inference logs which contain the actual response content
+            if hasattr(log, 'role') and log.role == 'inference' and hasattr(log, 'content') and log.content and str(log.content).strip():
+                # Skip tool calls and JSON - only collect actual text content
+                content = str(log.content)
+                if not content.startswith('[') and not content.startswith('{') and '"name"' not in content:
+                    response_text += content
         
         final_response = response_text.strip() or "No response generated."
         print(f"🤖 Assistant: {final_response[:100]}..." if len(final_response) > 100 else f"🤖 Assistant: {final_response}")

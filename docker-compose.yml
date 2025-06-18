@@ -34,6 +34,12 @@ services:
       - ollama
     networks:
       - ollama-docker
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   llama-stack-playground:
     build:
@@ -49,6 +55,23 @@ services:
       - LLAMA_STACK_ENDPOINT=http://llama-stack:5000
     depends_on:
       - llama-stack
+    networks:
+      - ollama-docker
+
+  chainlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.chainlit
+    ports:
+      - ${CHAINLIT_PORT:-8000}:8000
+    container_name: chainlit-app
+    restart: always
+    environment:
+      - LLAMA_STACK_API_URL=http://llama-stack:5000
+      - VECTOR_DB_ID=my_demo_vector_db
+    depends_on:
+      llama-stack:
+        condition: service_healthy
     networks:
       - ollama-docker
 
