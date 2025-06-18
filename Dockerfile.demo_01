@@ -18,11 +18,12 @@ RUN pip install uv
 RUN uv sync --frozen
 
 # Copy application code
-COPY chainlit_app.py .
+COPY demo_01_app.py .
+COPY demo_01_client.py .
 COPY .env* ./
 
 # Expose port
 EXPOSE 8000
 
 # Run chainlit
-CMD ["uv", "run", "chainlit", "run", "chainlit_app.py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "chainlit", "run", "demo_01_app.py", "--host", "0.0.0.0", "--port", "8000"]

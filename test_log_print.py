@@ -17,25 +17,16 @@ embedding_model_id = (
 ).identifier
 embedding_dimension = em.metadata["embedding_dimension"]
 
-_ = client.vector_dbs.register(
-    vector_db_id=vector_db_id,
-    embedding_model=embedding_model_id,
-    embedding_dimension=embedding_dimension,
-    provider_id="faiss",
-)
-source = "https://www.paulgraham.com/greatwork.html"
-print("rag_tool> Ingesting document:", source)
-document = RAGDocument(
-    document_id="document_1",
-    content=source,
-    mime_type="text/html",
-    metadata={},
-)
-client.tool_runtime.rag_tool.insert(
-    documents=[document],
-    vector_db_id=vector_db_id,
-    chunk_size_in_tokens=50,
-)
+try:
+    _ = client.vector_dbs.register(
+        vector_db_id=vector_db_id,
+        embedding_model=embedding_model_id,
+        embedding_dimension=embedding_dimension,
+        provider_id="faiss",
+    )
+except:
+    pass
+
 agent = Agent(
     client,
     model=model_id,
@@ -48,14 +39,24 @@ agent = Agent(
     ],
 )
 
-prompt = "How do you do great work?"
+prompt = "how to do great work?"
 print("prompt>", prompt)
 
 response = agent.create_turn(
     messages=[{"role": "user", "content": prompt}],
-    session_id=agent.create_session("rag_session"),
+    session_id=agent.create_session("test_session"),
     stream=True,
 )
 
-for log in AgentEventLogger().log(response):
+print("\n=== Analyzing log events ===")
+for i, log in enumerate(AgentEventLogger().log(response)):
+    if i>10:
+        break
+    print(f"\nEvent {i}:")
+    print(f"  Type: {type(log)}")
+    if hasattr(log, 'event'):
+        print(f"  Event type: {type(log.event)}")
+        if hasattr(log.event, 'payload'):
+            print(f"  Payload type: {type(log.event.payload)}")
+    print("  Printing log:")
     log.print()
