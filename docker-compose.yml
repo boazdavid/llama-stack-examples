@@ -65,7 +65,7 @@ services:
       context: .
       dockerfile: Dockerfile.demo_01
     ports:
-      - ${CHAINLIT_PORT:-9001}:8000
+      - ${CHAINLIT_PORT:-9090}:8000
     restart: always
     environment:
       - LLAMA_STACK_API_URL=http://llama-stack:5000
