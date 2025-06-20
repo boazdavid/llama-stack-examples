@@ -1,0 +1,81 @@
+services:
+  ollama:
+    image: docker.io/ollama/ollama:latest
+    ports:
+      - ${OLLAMA_PORT:-7869}:${OLLAMA_INTERNAL_PORT:-11434}
+    volumes:
+      - .:/code
+      - ./.ollama:/root/.ollama
+    pull_policy: always
+    tty: true
+    restart: always
+    environment:
+      - OLLAMA_KEEP_ALIVE=${OLLAMA_KEEP_ALIVE:-24h}
+      - OLLAMA_HOST=0.0.0.0
+    entrypoint: ["sh", "-c"]
+    command: ["ollama serve & sleep 10 && ollama pull ${INFERENCE_MODEL:-llama3.2:1b} && wait"]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "ollama list | grep -q '${INFERENCE_MODEL:-llama3.2:1b}'"]
+      interval: 30s
+      timeout: 15s
+      retries: 40
+      start_period: 300s
+
+
+  llama-stack:
+    image: llamastack/distribution-ollama:latest
+    ports:
+      - ${LLAMA_STACK_PORT:-5001}:5000
+    volumes:
+      - ./.llama:/root/.llama
+    pull_policy: always
+    restart: always
+    environment:
+      - INFERENCE_MODEL=${INFERENCE_MODEL:-llama3.2:1b}
+      - OLLAMA_URL=http://ollama:${OLLAMA_INTERNAL_PORT:-11434}
+      - LLAMA_STACK_PORT=5000
+    command: --port 5000 --template ollama
+    depends_on:
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  llama-stack-playground:
+    build:
+      context: .
+      dockerfile: Dockerfile.playground
+    ports:
+      - ${PLAYGROUND_PORT:-8501}:${PLAYGROUND_PORT:-8501}
+    volumes:
+      - ./.llama:/root/.llama
+    restart: always
+    environment:
+      - LLAMA_STACK_ENDPOINT=http://llama-stack:5000
+    depends_on:
+      llama-stack:
+        condition: service_healthy
+
+  chainlit-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.demo_01
+    ports:
+      - ${CHAINLIT_PORT:-9090}:8000
+    restart: always
+    environment:
+      - LLAMA_STACK_API_URL=http://llama-stack:5000
+      - VECTOR_DB_ID=my_demo_vector_db
+    depends_on:
+      llama-stack:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
