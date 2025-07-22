@@ -1,6 +1,9 @@
 # llama stack demo app
 
-Demo app with llama stack quickstart and additional UI built with chainlit.
+> [!NOTE]
+> This project is a work in progress. It might be a little rough around the edges right now. More detailed getting-started information, as well as debugging tips are coming soon!
+
+This project is a demo app built with llama stack's _quick start_ features and an additional UI built with chainlit.
 
 
 ## Getting Started
