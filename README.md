@@ -1,18 +1,21 @@
-# llama stack demo app
+# Llama Stack Demo App
 
-Demo app with llama stack quickstart and additional UI built with chainlit.
-
+A demo app providing a quick start example using [Llama Stack](https://www.llama.com/products/llama-stack/), and a UI built using [chainlit](https://docs.chainlit.io/get-started/overview).
 
 ## Getting Started
-### Quick Start
-- Install docker
 
-- Copy the environment file (and customize if needed):
+### Quick Start
+
+You can run the app using [docker](https://www.docker.com/) images. 
+
+- Install [docker](https://www.docker.com/) or an alternative like [podman](https://podman.io/). You will also need docker compose (or podman compose).
+
+- Copy the environment file and customize it, as needed:
    ```bash
    cp .env.example .env
    ```
 
-- Start all services:
+- Start all services. Replace `docker` if using an alternative:
    ```bash
    docker compose up -d
    ```
@@ -21,9 +24,9 @@ Demo app with llama stack quickstart and additional UI built with chainlit.
    - **Chainlit Chat Interface**: http://localhost:9090
    - **Llama Stack Playground**: http://localhost:8501
 
-
 ### Development Setup
-- Install uv and run uv sync to install python dependencies
+
+- [Install `uv`](https://docs.astral.sh/uv/) and run `uv sync` to install python dependencies
 
 - Run llama-stack via client CLI with chat completion:
    ```bash
@@ -33,7 +36,10 @@ Demo app with llama stack quickstart and additional UI built with chainlit.
    --message "write a haiku for meta's llama models"
    ```
 
-- Run the demo client: `uv run demo_01_client.py`
+- Run the demo client: 
+   ```bash
+   uv run demo_01_client.py
+   ```
 
 
 ## Features
@@ -45,9 +51,9 @@ Demo app with llama stack quickstart and additional UI built with chainlit.
 
 ## Notes
 
-- Tool calling with small models is inconsistent - sometimes it works sometimes it doesn't - need to use a bigger model for more consistent results
-- The Chainlit app automatically ingests documents on startup, which may take some time
-- All services use environment variables for configuration - customize via `.env` file
+- Tool calling with small models is inconsistent. Sometimes it works sometimes it doesn't. You need to use a bigger model for more consistent results.
+- The Chainlit app automatically ingests documents on startup, which may take some time.
+- All services use environment variables for configuration - customize via `.env` file.
 
 ## Architecture
 
@@ -62,10 +68,11 @@ All services are orchestrated via Docker Compose with proper health checks and s
 
 # TODO
 - [ ] Improve demo UI 
-   - Add RAG steps (like Allycat)
-   - Add AI Alliance branding (like Allycat)
+   - Add RAG steps (like [AllyCat](https://github.com/The-AI-Alliance/allycat))
+   - Add AI Alliance branding (like AllyCat)
    - Explore other UI frameworks (e.g. open-webui)
 - [ ] Merge llama-stack-playground with llama-stack container
-- [ ] Document llamastack issues
+- [ ] Document Llama Stack issues
     - undeclared dependencies for client: fire, requests
     - ollama distribution embedding model name mismatch: `all-MiniLM-L6-v2` vs `all-minilm:latest`
+   
