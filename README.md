@@ -10,6 +10,10 @@ You can run the app using [docker](https://www.docker.com/) images.
 
 - Install [docker](https://www.docker.com/) or an alternative like [podman](https://podman.io/). You will also need docker compose (or podman compose).
 
+        sudo /opt/homebrew/Cellar/podman/5.2.2/bin/podman-mac-helper install
+        podman machine stop; podman machine start
+
+
 - Copy the environment file and customize it, as needed:
    ```bash
    cp .env.example .env
@@ -41,6 +45,50 @@ You can run the app using [docker](https://www.docker.com/) images.
    uv run demo_01_client.py
    ```
 
+#### Using Ollama Running Locally
+
+If you aren't running the docker image with `ollama`, but instead you are running the `ollama` server locally, then use this command to run the client CLI:
+
+In one terminal window:
+```bash
+ollama serve
+```
+
+<!-- ENABLE_OLLAMA=ollama OLLAMA_INFERENCE_MODEL=llama3.2:1b \
+   uv run llama-stack-client configure \
+   --endpoint http://localhost:5001 \
+   --api-key none
+ -->
+
+In a second terminal window:
+```bash
+ENABLE_OLLAMA=ollama OLLAMA_INFERENCE_MODEL=llama3.2:1b \
+   uv run --with llama-stack llama stack build \
+   --template starter --image-type venv --run
+```
+
+Notice the port number printed at the end of the (long) output:
+
+```
+INFO:     Uvicorn running on http://['::', '0.0.0.0']:5001 (Press CTRL+C to quit)
+```
+
+You may see a different port number. Whatever the value is, use it in the `--endpoint` URL next:
+
+
+```bash
+uv run llama-stack-client --endpoint http://localhost:/5001 \
+inference chat-completion \
+--model-id ollama/llama3.2:1b \
+--message "write a haiku for meta's llama models"
+```
+
+uv run llama-stack-client --endpoint http://localhost:/8321 \
+inference chat-completion \
+--model-id ollama/llama3.2:1b \
+--message "write a haiku for meta's llama models"
+
+> **NOTE:** To specify the model you have to prepend the name with `ollama/`. If you switch to the 3.2:3b model, you have to use `B` instead of `b`: `ollama/llama3.2:3B`!
 
 ## Features
 
