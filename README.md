@@ -7,7 +7,6 @@ This project is a demo app providing a quick-start example using [Llama Stack](h
 >
 > **Please join us!** We welcome [PRs](https://github.com/The-AI-Alliance/llama-stack-usecase1/pulls) and suggestions as [issues](https://github.com/The-AI-Alliance/llama-stack-usecase1/issues). Use the [discussions](https://github.com/The-AI-Alliance/llama-stack-usecase1/discussions) for general questions and suggestions. For more information about joining this project or other AI Alliance projects, go [here](https://the-ai-alliance.github.io/contributing/). 
 
-
 ## Getting Started
 
 ### Quick Start
@@ -84,4 +83,3 @@ All services are orchestrated via Docker Compose with proper health checks and s
 - [ ] Document Llama Stack issues
     - undeclared dependencies for client: fire, requests
     - ollama distribution embedding model name mismatch: `all-MiniLM-L6-v2` vs `all-minilm:latest`
-   
