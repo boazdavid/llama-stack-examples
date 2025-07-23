@@ -1,4 +1,4 @@
-# llama stack demo app
+# Llama Stack Demo App
 
 This project is a demo app providing a quick-start example using [Llama Stack](https://www.llama.com/products/llama-stack/), and a UI built using [chainlit](https://docs.chainlit.io/get-started/overview).
 
@@ -8,28 +8,36 @@ This project is a demo app providing a quick-start example using [Llama Stack](h
 > **Please join us!** We welcome [PRs](https://github.com/The-AI-Alliance/llama-stack-usecase1/pulls) and suggestions as [issues](https://github.com/The-AI-Alliance/llama-stack-usecase1/issues). Use the [discussions](https://github.com/The-AI-Alliance/llama-stack-usecase1/discussions) for general questions and suggestions. For more information about joining this project or other AI Alliance projects, go [here](https://the-ai-alliance.github.io/contributing/). 
 
 ## Getting Started
-### Quick Start
-- Install docker
 
-- Copy the environment file (and customize if needed):
+### Quick Start
+
+For convenient, quick invocation, you run the app using [docker](https://www.docker.com/). 
+
+- Install [docker](https://www.docker.com/) or an alternative like [podman](https://podman.io/). You will also need docker compose (or podman compose).
+    * If you install podman and you are using a Mac, consider installing the Mac "helper":
+        ```bash
+        sudo /opt/homebrew/Cellar/podman/5.2.2/bin/podman-mac-helper install
+        ```
+
+- Copy the environment file and customize it, as needed:
    ```bash
    cp .env.example .env
    ```
 
-- Start all services:
+- Start all services. (Replace `docker`, if using an alternative):
    ```bash
    docker compose up -d
    ```
 
-- Wait for all services to be healthy and then access the applications in your browser - these are the default ports if you did not customize them in the `.env` file:
-   - **Chainlit Chat Interface**: http://localhost:9090
-   - **Llama Stack Playground**: http://localhost:8501
-
+- Wait for all services to be healthy (this can take a minute...) and then access the applications in your browser. These are the default ports if you did not customize them in the `.env` file:
+   - **Chainlit Chat Interface**: [localhost:9090](http://localhost:9090)
+   - **Llama Stack Playground**: [localhost:8501](http://localhost:8501)
 
 ### Development Setup
-- Install uv and run uv sync to install python dependencies
 
-- Run llama-stack via client CLI with chat completion:
+- [Install `uv`](https://docs.astral.sh/uv/) and run `uv sync` to install python dependencies
+
+- Run llama-stack via the client CLI with chat completion:
    ```bash
    uv run llama-stack-client --endpoint http://localhost:5001 \
    inference chat-completion \
@@ -37,8 +45,10 @@ This project is a demo app providing a quick-start example using [Llama Stack](h
    --message "write a haiku for meta's llama models"
    ```
 
-- Run the demo client: `uv run demo_01_client.py`
-
+- Run the demo client: 
+   ```bash
+   uv run demo_01_client.py
+   ```
 
 ## Features
 
@@ -49,9 +59,9 @@ This project is a demo app providing a quick-start example using [Llama Stack](h
 
 ## Notes
 
-- Tool calling with small models is inconsistent - sometimes it works sometimes it doesn't - need to use a bigger model for more consistent results
-- The Chainlit app automatically ingests documents on startup, which may take some time
-- All services use environment variables for configuration - customize via `.env` file
+- Tool calling with small models is inconsistent. Sometimes it works sometimes it doesn't. You need to use a bigger model for more consistent results.
+- The Chainlit app automatically ingests documents on startup, which may take some time.
+- All services use environment variables for configuration - customize via `.env` file.
 
 ## Architecture
 
@@ -66,10 +76,10 @@ All services are orchestrated via Docker Compose with proper health checks and s
 
 # TODO
 - [ ] Improve demo UI 
-   - Add RAG steps (like Allycat)
-   - Add AI Alliance branding (like Allycat)
+   - Add RAG steps (like [AllyCat](https://github.com/The-AI-Alliance/allycat))
+   - Add AI Alliance branding (like AllyCat)
    - Explore other UI frameworks (e.g. open-webui)
 - [ ] Merge llama-stack-playground with llama-stack container
-- [ ] Document llamastack issues
+- [ ] Document Llama Stack issues
     - undeclared dependencies for client: fire, requests
     - ollama distribution embedding model name mismatch: `all-MiniLM-L6-v2` vs `all-minilm:latest`
