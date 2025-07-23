@@ -1,38 +1,44 @@
 # Llama Stack Demo App
 
-A demo app providing a quick start example using [Llama Stack](https://www.llama.com/products/llama-stack/), and a UI built using [chainlit](https://docs.chainlit.io/get-started/overview).
+This project is a demo app providing a quick-start example using [Llama Stack](https://www.llama.com/products/llama-stack/), and a UI built using [chainlit](https://docs.chainlit.io/get-started/overview).
+
+> [!NOTE]
+> This project is a work in progress. It might be a little rough around the edges right now. More detailed getting-started information, as well as debugging tips are coming soon!
+>
+> **Please join us!** We welcome [PRs](https://github.com/The-AI-Alliance/llama-stack-usecase1/pulls) and suggestions as [issues](https://github.com/The-AI-Alliance/llama-stack-usecase1/issues). Use the [discussions](https://github.com/The-AI-Alliance/llama-stack-usecase1/discussions) for general questions and suggestions. For more information about joining this project or other AI Alliance projects, go [here](https://the-ai-alliance.github.io/contributing/). 
+
 
 ## Getting Started
 
 ### Quick Start
 
-You can run the app using [docker](https://www.docker.com/) images. 
+For convenient, quick invocation, you run the app using [docker](https://www.docker.com/). 
 
 - Install [docker](https://www.docker.com/) or an alternative like [podman](https://podman.io/). You will also need docker compose (or podman compose).
-
+    * If you install podman and you are using a Mac, consider installing the Mac "helper":
+        ```bash
         sudo /opt/homebrew/Cellar/podman/5.2.2/bin/podman-mac-helper install
-        podman machine stop; podman machine start
-
+        ```
 
 - Copy the environment file and customize it, as needed:
    ```bash
    cp .env.example .env
    ```
 
-- Start all services. Replace `docker` if using an alternative:
+- Start all services. (Replace `docker`, if using an alternative):
    ```bash
    docker compose up -d
    ```
 
-- Wait for all services to be healthy and then access the applications in your browser - these are the default ports if you did not customize them in the `.env` file:
-   - **Chainlit Chat Interface**: http://localhost:9090
-   - **Llama Stack Playground**: http://localhost:8501
+- Wait for all services to be healthy (this can take a minute...) and then access the applications in your browser. These are the default ports if you did not customize them in the `.env` file:
+   - **Chainlit Chat Interface**: [localhost:9090](http://localhost:9090)
+   - **Llama Stack Playground**: [localhost:8501](http://localhost:8501)
 
 ### Development Setup
 
 - [Install `uv`](https://docs.astral.sh/uv/) and run `uv sync` to install python dependencies
 
-- Run llama-stack via client CLI with chat completion:
+- Run llama-stack via the client CLI with chat completion:
    ```bash
    uv run llama-stack-client --endpoint http://localhost:5001 \
    inference chat-completion \
@@ -44,51 +50,6 @@ You can run the app using [docker](https://www.docker.com/) images.
    ```bash
    uv run demo_01_client.py
    ```
-
-#### Using Ollama Running Locally
-
-If you aren't running the docker image with `ollama`, but instead you are running the `ollama` server locally, then use this command to run the client CLI:
-
-In one terminal window:
-```bash
-ollama serve
-```
-
-<!-- ENABLE_OLLAMA=ollama OLLAMA_INFERENCE_MODEL=llama3.2:1b \
-   uv run llama-stack-client configure \
-   --endpoint http://localhost:5001 \
-   --api-key none
- -->
-
-In a second terminal window:
-```bash
-ENABLE_OLLAMA=ollama OLLAMA_INFERENCE_MODEL=llama3.2:1b \
-   uv run --with llama-stack llama stack build \
-   --template starter --image-type venv --run
-```
-
-Notice the port number printed at the end of the (long) output:
-
-```
-INFO:     Uvicorn running on http://['::', '0.0.0.0']:5001 (Press CTRL+C to quit)
-```
-
-You may see a different port number. Whatever the value is, use it in the `--endpoint` URL next:
-
-
-```bash
-uv run llama-stack-client --endpoint http://localhost:/5001 \
-inference chat-completion \
---model-id ollama/llama3.2:1b \
---message "write a haiku for meta's llama models"
-```
-
-uv run llama-stack-client --endpoint http://localhost:/8321 \
-inference chat-completion \
---model-id ollama/llama3.2:1b \
---message "write a haiku for meta's llama models"
-
-> **NOTE:** To specify the model you have to prepend the name with `ollama/`. If you switch to the 3.2:3b model, you have to use `B` instead of `b`: `ollama/llama3.2:3B`!
 
 ## Features
 
