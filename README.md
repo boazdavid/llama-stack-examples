@@ -1,10 +1,11 @@
 # llama stack demo app
 
+This project is a demo app providing a quick-start example using [Llama Stack](https://www.llama.com/products/llama-stack/), and a UI built using [chainlit](https://docs.chainlit.io/get-started/overview).
+
 > [!NOTE]
 > This project is a work in progress. It might be a little rough around the edges right now. More detailed getting-started information, as well as debugging tips are coming soon!
-
-This project is a demo app built with llama stack's _quick start_ features and an additional UI built with chainlit.
-
+>
+> **Please join us!** We welcome [PRs](https://github.com/The-AI-Alliance/llama-stack-usecase1/pulls) and suggestions as [issues](https://github.com/The-AI-Alliance/llama-stack-usecase1/issues). Use the [discussions](https://github.com/The-AI-Alliance/llama-stack-usecase1/discussions) for general questions and suggestions. For more information about joining this project or other AI Alliance projects, go [here](https://the-ai-alliance.github.io/contributing/). 
 
 ## Getting Started
 ### Quick Start
