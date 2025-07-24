@@ -1,14 +1,17 @@
 [project]
-name = "llama-stack-01"
+name = "llama-stack-chat-example-01"
 version = "0.1.0"
-description = "Add your description here"
+description = "A simple 'three-tier' (ollama inference, stack, GUI) Llama Stack example"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "chainlit>=2.5.5",
     "faiss-cpu>=1.11.0",
     "fire>=0.7.0",
+    "llama-stack>=0.2.9",
     "llama-stack-client>=0.2.10",
+    "ollama>=0.5.1",
     "python-dotenv>=1.1.0",
     "requests>=2.32.4",
+    "streamlit>=1.47.0",
 ]
