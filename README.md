@@ -79,6 +79,10 @@ uv run --with llama-stack llama stack build \
    --template starter --image-type venv --run
 ```
 
+> [!WARNING]
+> Note that `OLLAMA_INFERENCE_MODEL=llama3.2:1b` doesn't have `ollama/` before the model name. This is the identifier `ollama` expects for the model. In contrast, commands you'll see below
+use `ollama/llama3.2:1b`, which is the identifier Llama Stack uses.
+
 You should see a message like this:
 
 ```
