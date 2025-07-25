@@ -198,9 +198,7 @@ uv run llama-stack-client \
 
 Note how the model id is specified, with the `ollama/` prefix. If you omit it, you'll get an error that the model couldn't be found.
 
-If you want to try an interactive session, replace the `--message "..."` arguments with `--session`. The prompt will be `>>>`. To exit the loop, use control-d or control-c.
-
-You should get output like this:
+You should get output similar to this:
 
 ```
 INFO:httpx:HTTP Request: POST http://localhost:5001/v1/openai/v1/chat/completions "HTTP/1.1 200 OK"
@@ -238,28 +236,12 @@ OpenAIChatCompletion(
 )
 ```
 
+If you want to try an interactive session, replace the `--message "..."` arguments with `--session`. The prompt will be `>>>`. To exit the loop, use control-d or control-c.
 
-ENABLE_OLLAMA=ollama \
-OLLAMA_INFERENCE_MODEL=llama3.2:3B \
-OLLAMA_URL=http://ollama:11434 \
-LLAMA_STACK_PORT=5001 \
-uv run llama-stack-client --endpoint http://localhost:5001 \
-inference chat-completion \
---model-id llama3.2:3B \
---message "write a haiku for meta's llama models"
-
-```
-#LLAMA_STACK_ENDPOINT=http://localhost:5001 \
-OLLAMA_INFERENCE_MODEL=llama3.2:1b \
-uv run llama-stack-client \
-   inference chat-completion \
-   --message "write a haiku for meta's llama models"
-#   --model-id llama3.2:1b \
-```
-
-Run the demo client: 
+Finally, run the demo client: 
 
 ```bash
+INFERENCE_MODEL=ollama/llama3.2:1b \
 LLAMA_STACK_ENDPOINT=http://localhost:5001 \
 uv run demo_01_client.py
 ```
