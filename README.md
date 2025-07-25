@@ -124,48 +124,138 @@ First, a GUI app built with [Streamlit](https://streamlit.io/), which is called 
 
 ```shell
 LLAMA_STACK_ENDPOINT=http://localhost:5001 \
-uv run --with llama-stack streamlit run \
+uv run --with streamlit,fireworks streamlit run \
    .venv/lib/python3.*/site-packages/llama_stack/distribution/ui/app.py \
    --server.port 8501 --server.address localhost
 ```
 
-It should pop up a browser window with the GUI at URL `http://localhost:8500`.
+It should pop up a browser window with the GUI at URL `http://localhost:8500`. Select the `ollama/llama3.2:1b` model in the drop down menu. If you don't, you will most likely trigger an exception when you submit a query and the first model in the list is used!
+
+> [!NOTE]
+> If you plan to use this GUI regularly, consider installing the `streamlit` and `fireworks` with uv:
+> ```shell
+> uv add streamlit fireworks
+> ```
+> Then you can remove `--with streamlit,fireworks` from the previous command.
 
 #### GUI #2: Chainlit Chat Interface
 
 A second GUI environment is a chat app built with [Chainlit](https://docs.chainlit.io/get-started/overview).
 
 ```shell
+INFERENCE_MODEL=ollama/llama3.2:1b \
 LLAMA_STACK_ENDPOINT=http://localhost:5001 \
-uv run chainlit run demo_01_app.py --host localhost --port 8000
+uv run --with chainlit,fireworks chainlit run demo_01_app.py --host localhost --port 8000
 ```
 
-It should pop up a browser window with the GUI at URL `http://localhost:9000`.
+> [!NOTE] 
+> The model environment variable is specified with the `ollama/` prefix. If you don't specify a model the `demo_01_app` will grab the first LLM returned by the llama stack server, which likely won't work, causing a `500` error to be returned to the browser.
+
+The command should pop up a browser window with the GUI at URL `http://localhost:8000`, where you can enter prompts.
+
+You can also `uv add chainlit fireworks`, etc., if you prefer, as discussed for the first GUI.
 
 ### Development Setup
 
-If you used the Docker-based quick start, keep the containers running for what follows. If you used the native execution quick start, you'll need to keep the `ollama` and `llama-stack` invocations running.
+If you used the Docker-based quick start, keep the containers running for what follows. If you used the "native" quick start execution, you'll need to keep the `ollama` and `llama-stack` services running.
 
-As for the "native" execution above, we'll use [`uv`](https://docs.astral.sh/uv/). [Install `uv`](https://docs.astral.sh/uv/)  if you haven't done this already, then run `uv sync` to install the python dependencies. 
+Just as we did for the "native" quick start execution above, we'll use [`uv`](https://docs.astral.sh/uv/). [Install `uv`](https://docs.astral.sh/uv/)  if you haven't done this already, then run `uv sync` to install the python dependencies. 
 
-If you don't want to use `uv`, then install the dependencies in `pyproject.toml` another way and omit the `uv run` command prefixes use next.
+If you don't want to use `uv`, then install the dependencies in `pyproject.toml` another way and omit the `uv run` command prefixes used next.
 
-Run llama-stack via the client CLI with chat completion:
+The `llama-stack-client` CLI is an alternative to the GUI apps. Try a few commands to verify connectivity to the services. First, knowing how to get help is useful. (We won't show the output for the next several commands, but obviously you shouldn't get errors!)
 
-```bash
-LLAMA_STACK_ENDPOINT=http://localhost:5001 \
-uv run llama-stack-client --endpoint http://localhost:5001 \
+```shell
+uv run llama-stack-client --help
+```
+
+For details about the sub-commands, e.g., for `models`:
+
+```shell
+uv run llama-stack-client models --help
+uv run llama-stack-client models list --help
+```
+
+> [!TIP]
+> If you use a different llama stack server endpoint than the default `http://localhost:5001`, which we are using, then pass the `--endpoint http://server:port` option after `llama-stack-client` and before the sub-commands, `models` in this example. 
+
+Let's try `models list`:
+
+```shell
+uv run llama-stack-client models list
+```
+
+The content should be the same as the curl command used previously (`curl -f http://localhost:5001/v1/models`), except a nicely-formatted table is printed instead of JSON.
+
+Try an inference call with the client CLI's `inference chat-completion` sub command:
+
+```shell
+uv run llama-stack-client \
    inference chat-completion \
-   --model-id llama3.2:1b \
+   --model-id 'ollama/llama3.2:1b' \
    --message "write a haiku for meta's llama models"
 ```
 
-LLAMA_STACK_ENDPOINT=http://localhost:5001 \
-uv run llama-stack-client \
-   inference chat-completion 
+Note how the model id is specified, with the `ollama/` prefix. If you omit it, you'll get an error that the model couldn't be found.
 
-   --model-id llama3.2:1b \
+If you want to try an interactive session, replace the `--message "..."` arguments with `--session`. The prompt will be `>>>`. To exit the loop, use control-d or control-c.
+
+You should get output like this:
+
+```
+INFO:httpx:HTTP Request: POST http://localhost:5001/v1/openai/v1/chat/completions "HTTP/1.1 200 OK"
+OpenAIChatCompletion(
+    id='chatcmpl-36b421f0-dbf0-4e14-bd60-dbe947f5f0cb',
+    choices=[
+        OpenAIChatCompletionChoice(
+            finish_reason='stop',
+            index=0,
+            message=OpenAIChatCompletionChoiceMessageOpenAIAssistantMessageParam(
+                role='assistant',
+                content='Galloping digital\nReflections of the self stare back\nVirtual mystics',
+                name=None,
+                tool_calls=None,
+                refusal=None,
+                annotations=None,
+                audio=None,
+                function_call=None
+            ),
+            logprobs=None
+        )
+    ],
+    created=1753474963,
+    model='llama3.2:1b',
+    object='chat.completion',
+    service_tier=None,
+    system_fingerprint='fp_ollama',
+    usage={
+        'completion_tokens': 17,
+        'prompt_tokens': 34,
+        'total_tokens': 51,
+        'completion_tokens_details': None,
+        'prompt_tokens_details': None
+    }
+)
+```
+
+
+ENABLE_OLLAMA=ollama \
+OLLAMA_INFERENCE_MODEL=llama3.2:3B \
+OLLAMA_URL=http://ollama:11434 \
+LLAMA_STACK_PORT=5001 \
+uv run llama-stack-client --endpoint http://localhost:5001 \
+inference chat-completion \
+--model-id llama3.2:3B \
+--message "write a haiku for meta's llama models"
+
+```
+#LLAMA_STACK_ENDPOINT=http://localhost:5001 \
+OLLAMA_INFERENCE_MODEL=llama3.2:1b \
+uv run llama-stack-client \
+   inference chat-completion \
    --message "write a haiku for meta's llama models"
+#   --model-id llama3.2:1b \
+```
 
 Run the demo client: 
 
