@@ -74,7 +74,7 @@ Build and run the server
 ```shell
 ENABLE_OLLAMA=ollama \
 OLLAMA_INFERENCE_MODEL=llama3.2:1b \
-LLAMA_STACK_PORT=8000 \
+LLAMA_STACK_PORT=5001 \
 uv run --with llama-stack llama stack build \
    --template starter --image-type venv --run
 ```
@@ -82,13 +82,13 @@ uv run --with llama-stack llama stack build \
 You should see a message like this:
 
 ```
-INFO:     Uvicorn running on http://['::', '0.0.0.0']:8000 (Press CTRL+C to quit)
+INFO:     Uvicorn running on http://['::', '0.0.0.0']:5001 (Press CTRL+C to quit)
 ```
 
 Open a new terminal window and check that you can get the list of models Llama Stack knows about:
 
 ```shell
-curl -f http://localhost:8000/v1/models
+curl -f http://localhost:5001/v1/models
 ```
 
 If this works successfully, you'll get some JSON back with the list of models. If you have [`jq`](https://jqlang.org/) installed, piping the output through `jq .` yields this result (and probably other models listed, too):
@@ -123,10 +123,10 @@ Now you can run one of two, or perhaps both GUI environments.
 First, a GUI app built with [Streamlit](https://streamlit.io/), which is called **Llama Stack Playground** in the docker quick start discussed above, because this example uses a UI that comes with the `llama_stack` distribution. This is why we use a _glob_ in the next command to locate the file inside the `.venv` directory:
 
 ```shell
-LLAMA_STACK_ENDPOINT=http://localhost:8000 \
+LLAMA_STACK_ENDPOINT=http://localhost:5001 \
 uv run --with llama-stack streamlit run \
    .venv/lib/python3.*/site-packages/llama_stack/distribution/ui/app.py \
-   --server.port 8500 --server.address localhost
+   --server.port 8501 --server.address localhost
 ```
 
 It should pop up a browser window with the GUI at URL `http://localhost:8500`.
@@ -136,8 +136,8 @@ It should pop up a browser window with the GUI at URL `http://localhost:8500`.
 A second GUI environment is a chat app built with [Chainlit](https://docs.chainlit.io/get-started/overview).
 
 ```shell
-LLAMA_STACK_ENDPOINT=http://localhost:8000 \
-uv run chainlit run demo_01_app.py --host localhost --port 9000
+LLAMA_STACK_ENDPOINT=http://localhost:5001 \
+uv run chainlit run demo_01_app.py --host localhost --port 8000
 ```
 
 It should pop up a browser window with the GUI at URL `http://localhost:9000`.
@@ -146,13 +146,6 @@ It should pop up a browser window with the GUI at URL `http://localhost:9000`.
 
 If you used the Docker-based quick start, keep the containers running for what follows. If you used the native execution quick start, you'll need to keep the `ollama` and `llama-stack` invocations running.
 
-First, set the following `PORT` variable appropriate:
-
-```shell
-PORT=5001  # If using the Docker-based execution
-PORT=8000  # If using the "native" execution
-```
-
 As for the "native" execution above, we'll use [`uv`](https://docs.astral.sh/uv/). [Install `uv`](https://docs.astral.sh/uv/)  if you haven't done this already, then run `uv sync` to install the python dependencies. 
 
 If you don't want to use `uv`, then install the dependencies in `pyproject.toml` another way and omit the `uv run` command prefixes use next.
@@ -160,24 +153,24 @@ If you don't want to use `uv`, then install the dependencies in `pyproject.toml`
 Run llama-stack via the client CLI with chat completion:
 
 ```bash
-LLAMA_STACK_ENDPOINT=http://localhost:$PORT \
-uv run llama-stack-client --endpoint http://localhost:$PORT \
+LLAMA_STACK_ENDPOINT=http://localhost:5001 \
+uv run llama-stack-client --endpoint http://localhost:5001 \
    inference chat-completion \
    --model-id llama3.2:1b \
    --message "write a haiku for meta's llama models"
 ```
 
-LLAMA_STACK_ENDPOINT=http://localhost:$PORT \
+LLAMA_STACK_ENDPOINT=http://localhost:5001 \
 uv run llama-stack-client \
    inference chat-completion 
-   
+
    --model-id llama3.2:1b \
    --message "write a haiku for meta's llama models"
 
 Run the demo client: 
 
 ```bash
-LLAMA_STACK_ENDPOINT=http://localhost:$PORT \
+LLAMA_STACK_ENDPOINT=http://localhost:5001 \
 uv run demo_01_client.py
 ```
 
