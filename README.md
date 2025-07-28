@@ -18,7 +18,7 @@ If you use Linux on a machine with an AMD64-compatible CPU, using the Docker opt
 
 ### Quick Start: Docker
 
-For convenient, quick invocation, you run the app using [Docker](https://www.docker.com/). 
+For convenient, quick invocation, you can run the app using [Docker](https://www.docker.com/). 
 
 > [!WARNING]
 > At this time, we only recommend this approach if you are working on a Linux system with an AMD64-compatible processor. Also, if you are a Podman user, this quick start method uses `docker compose` and `podman compose` doesn't appear to be sufficiently compatible to use as a replacement.
