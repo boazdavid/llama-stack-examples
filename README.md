@@ -7,6 +7,8 @@ This project is a demo app providing a quick-start example using [Llama Stack](h
 >
 > **Please join us!** We welcome [PRs](https://github.com/The-AI-Alliance/llama-stack-usecase1/pulls) and suggestions as [issues](https://github.com/The-AI-Alliance/llama-stack-usecase1/issues). Use the [discussions](https://github.com/The-AI-Alliance/llama-stack-usecase1/discussions) for general questions and suggestions. For more information about joining this project or other AI Alliance projects, go [here](https://the-ai-alliance.github.io/contributing/). 
 
+If you are interested in running Llama Stack on Kubernetes or OpenShift, see [these examples from opendatahub.io](https://github.com/opendatahub-io/llama-stack-demos).
+
 ## Getting Started
 
 We describe two _quick start_ approaches:
@@ -270,8 +272,7 @@ The project consists of four main services:
 3. **Llama Stack Playground**: Official web UI for testing
 4. **Chainlit App**: Custom chat interface with RAG capabilities
 
-All services are orchestrated via Docker Compose with proper health checks and startup dependencies.
-
+In the docker execution option described above, all services are orchestrated via Docker Compose with proper health checks and startup dependencies. The "native execution" alternative shows how to run each service individually and commands to run as health checks.
 
 # TODO
 - [ ] Improve demo UI 
