@@ -76,7 +76,7 @@ uv run --with llama-stack llama stack build \
 > [!WARNING]
 > Note that `OLLAMA_INFERENCE_MODEL=llama3.2:1b` doesn't have `ollama/` before the model name. This is the identifier `ollama` expects for the model. In contrast, commands you'll see below use `ollama/llama3.2:1b`, which is the identifier Llama Stack uses.
 
-You should see a message like this:
+It can take a moment to come up. It is ready when you see a message like this:
 
 ```
 INFO:     Uvicorn running on http://['::', '0.0.0.0']:5001 (Press CTRL+C to quit)
