@@ -2,8 +2,8 @@
 
 This repo contains a growing suite of example applications for <a href="https://github.com/meta-llama/llama-stack">Llama Stack</a> that demonstrate various stack features and common application patterns:
 
-* [`01-chatbot`](o1-chatbot): A getting-start chatbot app, which shows how to build and deploy Llama Stack applications. It includes two different UI options and inference with an [ollama](https://ollama.com)-hosted [Llama 3](https://www.llama.com/models/llama-3/) model.
-* [`o2-deep-research`](o2-deep-research): A _deep research_ app (under development), which illustrates an emerging, common application pattern for AI. The user asks for detailed information about a topic, for example the market performance and financials for a publicly-traded company, agents find relevant data from diverse sources, and finally an LLM digests the information retrieved and prepares a report. This example will demonstrate Llama Stack support for agent-based application development, including the use of protocols like [MCP](https://modelcontextprotocol.io/introduction).
+* [`01-chatbot`](blob/deanw/multiple-examples-issue-8/apps/01-chatbot/README.md): A getting-start chatbot app, which shows how to build and deploy Llama Stack applications. It includes two different UI options and inference with an [ollama](https://ollama.com)-hosted [Llama 3](https://www.llama.com/models/llama-3/) model.
+* [`o2-deep-research`](blob/deanw/multiple-examples-issue-8/apps/o2-deep-research/README.md): A _deep research_ app (under development), which illustrates an emerging, common application pattern for AI. The user asks for detailed information about a topic, for example the market performance and financials for a publicly-traded company, agents find relevant data from diverse sources, and finally an LLM digests the information retrieved and prepares a report. This example will demonstrate Llama Stack support for agent-based application development, including the use of protocols like [MCP](https://modelcontextprotocol.io/introduction).
 
 See the READMEs for each example for more information.
 
