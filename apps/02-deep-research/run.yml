@@ -1,0 +1,65 @@
+version: '2'
+
+image_name: "local-openai-stack"
+container_image: null
+
+apis:
+  - inference
+  - tool_runtime
+  - agents
+  - vector_io
+  - safety
+    
+providers:
+  inference:
+    - provider_id: openai
+      provider_type: remote::openai
+      config:
+        api_key: ${env.OPENAI_API_KEY}
+
+  safety:
+    - provider_id: llama-guard
+      provider_type: inline::llama-guard
+      config: {}
+  agents:
+    - provider_id: meta-reference
+      provider_type: inline::meta-reference
+      config:
+        # These must be objects with a "type" field, not plain strings
+        persistence_store:
+          type: sqlite
+          namespace: null
+          db_path: ${env.SQLITE_STORE_DIR:~/.llama/local-openai-stack}/agents_store.db
+        responses_store:
+          type: sqlite
+          db_path: ${env.SQLITE_STORE_DIR:~/.llama/local-openai-stack}/responses_store.db
+
+  tool_runtime:
+    - provider_id: tavily-search
+      provider_type: remote::tavily-search
+      config:
+        api_key: ${env.TAVILY_SEARCH_API_KEY}
+        max_results: 8
+
+  vector_io:
+    - provider_id: faiss
+      provider_type: inline::faiss
+      config:
+        kvstore:
+          type: sqlite
+          namespace: null
+          db_path: ${env.SQLITE_STORE_DIR:~/.llama/local-openai-stack}/faiss_store.db
+
+models:
+  - model_id: gpt-4o-mini
+    provider_id: openai
+    model_type: llm
+    provider_model_id: gpt-4o-mini
+
+tool_groups:
+  - toolgroup_id: builtin::websearch
+    provider_id: tavily-search
+
+server:
+  port: 8321
+
