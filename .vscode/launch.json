@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "Toolguard Demo",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "toolguard.demo"
+        }
+    ]
+}

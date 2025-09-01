@@ -139,3 +139,4 @@ dmypy.json
 cython_debug/uv.lock
 
 uv.lock
+.DS_Store
