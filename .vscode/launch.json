@@ -1,10 +1,11 @@
 {
     "configurations": [
         {
-            "name": "Toolguard Demo",
+            "name": "Toolguard Resps Demo",
             "type": "debugpy",
             "request": "launch",
-            "module": "toolguard.demo"
+            "module": "toolguard.demo_resps",
+            "justMyCode": false
         }
     ]
 }
