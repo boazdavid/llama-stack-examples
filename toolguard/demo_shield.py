@@ -11,14 +11,15 @@ async def main():
         print(shield.identifier)
 
     shield = client.shields.register(
-        shield_id="airline_toolguard",
+        shield_id="clinic_toolguard",
         params={
-            "path": "123"
+            "path": "../gen_policy_validator/eval/clinic/output/step2_claude4sonnet",
+            "touch_points":["tool_input"]
         },
         provider_id="tool-guard",
     )
 
-    resp = client.safety.run_shield(messages=[], shield_id="airline_toolguard", params={})
+    resp = client.safety.run_shield(messages=[], shield_id="clinic_toolguard", params={})
     print(resp)
 
     shields = client.shields.list()

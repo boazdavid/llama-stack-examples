@@ -54,8 +54,9 @@ providers:
   #     excluded_categories: []
   - provider_id: tool-guard
     provider_type: inline::tool-guard
-    config:
-      path: "../gen_policy_validator/eval/clinic/output/step2_claude4sonnet"
+    # config:
+      # touch_points: [tool_input] #default
+  
   agents:
   - provider_id: meta-reference
     provider_type: inline::meta-reference

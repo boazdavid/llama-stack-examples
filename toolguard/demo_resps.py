@@ -12,13 +12,12 @@ async def main():
     tools_resp = await list_mcp_tools(MCP_URL, {})
     print(tools_resp.model_dump_json(indent=2))
 
-    # from .book_reserv import book_resrervation_tool 
-    # from .list_airports import list_airports_tool
     response = client.responses.create(
         model=LLAMA_STACK_MODEL_ID,
-        # input="list me all doctors (dont apply any filter) and sort them by name.",
-        input="list me all appointements of patient with ssn=12345.",
-        # before_tools_shield= ["my_guard"],
+        # filters=[
+        #     "clinic_toolguard"
+        # ],
+        input="set an appointement for patient with ssn=12345, with my family physician, Dr. David Lee on 17 of September 2025, at 10 am.",
         tools=[
             {
                 "type": "mcp",
