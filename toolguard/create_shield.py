@@ -10,11 +10,11 @@ async def main():
     for shield in shields:
         print(shield.identifier)
     
-    shield = client.shields.register(
-        shield_id="clinic_toolguard",
+    client.shields.register(
+        shield_id="myclinic_toolguard",
         params={
-            "path": "../gen_policy_validator/eval/clinic/output/step2_claude4sonnet",
-            "touch_points":["tool_input"]
+            "path": "../ToolGuardAgent/output/step2_claude4sonnet",
+            "touch_points": ["tool_input"]
         },
         provider_id="tool-guard",
     )

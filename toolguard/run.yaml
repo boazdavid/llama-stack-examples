@@ -48,12 +48,12 @@ providers:
   #       type: sqlite
   #       db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/files_metadata.db
   safety:
+  - provider_id: tool-guard
+    provider_type: inline::tool-guard
   # - provider_id: llama-guard
   #   provider_type: inline::llama-guard
   #   config:
   #     excluded_categories: []
-  - provider_id: tool-guard
-    provider_type: inline::tool-guard
     # config:
       # touch_points: [tool_input] #default
   
