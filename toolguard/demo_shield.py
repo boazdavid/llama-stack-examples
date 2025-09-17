@@ -9,7 +9,7 @@ async def main():
     shields = client.shields.list()
     for shield in shields:
         print(shield.identifier)
-
+    
     shield = client.shields.register(
         shield_id="clinic_toolguard",
         params={
