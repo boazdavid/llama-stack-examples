@@ -36,9 +36,11 @@ providers:
   - provider_id: faiss
     provider_type: inline::faiss
     config:
-      kvstore:
-        type: sqlite
-        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/faiss_store.db
+      persistence:
+        backend: kv_default
+        namespace: registry
+        # type: sqlite
+        # db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/faiss_store.db
   # files:
   # - provider_id: meta-reference-files
   #   provider_type: inline::localfs
@@ -56,18 +58,21 @@ providers:
   #     excluded_categories: []
     # config:
       # touch_points: [tool_input] #default
-  
   agents:
   - provider_id: meta-reference
     provider_type: inline::meta-reference
     config:
-      persistence_store:
-        type: sqlite
-        namespace: null
-        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/agents_store.db
-      responses_store:
-        type: sqlite
-        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/responses_store.db
+      persistence:
+        agent_state:
+          # type: sqlite
+          namespace: registry
+          backend: kv_default
+          # db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/agents_store.db
+        responses:
+          # type: sqlite
+          # db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/responses_store.db
+          backend: sql_default
+          table_name: responses
   # telemetry:
   # - provider_id: meta-reference
   #   provider_type: inline::meta-reference
@@ -138,12 +143,12 @@ providers:
     provider_type: remote::wolfram-alpha
     config:
       api_key: ${env.WOLFRAM_ALPHA_API_KEY:}
-metadata_store:
-  type: sqlite
-  db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/registry.db
-inference_store:
-  type: sqlite
-  db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/inference_store.db
+# metadata_store:
+#   type: sqlite
+#   db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/registry.db
+# inference_store:
+#   type: sqlite
+#   db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/sample-notebook}/inference_store.db
 models:
 # - metadata: {}
 #   model_id: watsonx-Llama-3.3-70B-Instruct
@@ -176,6 +181,33 @@ vector_dbs: []
 datasets: []
 scoring_fns: []
 benchmarks: []
+storage:
+  backends:
+    kv_default:
+      type: kv_postgres
+      host: ${env.POSTGRES_HOST:=localhost}
+      port: ${env.POSTGRES_PORT:=5432}
+      db: ${env.POSTGRES_DB:=llamastack}
+      user: ${env.POSTGRES_USER:=llamastack}
+      password: ${env.POSTGRES_PASSWORD:=llamastack}
+      table_name: ${env.POSTGRES_TABLE_NAME:=llamastack_kvstore}
+    sql_default:
+      type: sql_postgres
+      host: ${env.POSTGRES_HOST:=localhost}
+      port: ${env.POSTGRES_PORT:=5432}
+      db: ${env.POSTGRES_DB:=llamastack}
+      user: ${env.POSTGRES_USER:=llamastack}
+      password: ${env.POSTGRES_PASSWORD:=llamastack}
+  stores: 
+    metadata:
+      backend: kv_default
+      namespace: registry
+    inference:
+      backend: sql_default
+      table_name: inference_store
+    conversations: 
+      backend: sql_default
+      table_name: inference_store
 tool_groups:
 - toolgroup_id: builtin::websearch
   provider_id: tavily-search
