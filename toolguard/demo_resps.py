@@ -26,6 +26,10 @@ async def main():
     
     resp = client.responses.create(
         model=LLAMA_STACK_MODEL_ID,
+        extra_body={
+            # "guardrails": ["myclinic_toolguard"],
+            "before_toolcall_shield_ids": ["myclinic_toolguard"]
+        },
         # filters=[
         #     "myclinic_toolguard"
         # ],
